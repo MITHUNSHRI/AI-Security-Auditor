@@ -1,0 +1,4 @@
+.venv
+AI_SECURITY_AUDITOR/.venv
+__pycache__
+*.pyc

@@ -1,0 +1,20 @@
+spec_version: 1
+name: AI_SECURITY_AUDITOR
+type: space
+runtime: fastapi
+app: server.app:app
+port: 8000
+tasks:
+  - id: task_1
+    name: "Secret Detection"
+    description: "Find hardcoded AWS secrets in config.py"
+    difficulty: "easy"
+  - id: task_2
+    name: "SQL Injection"
+    description: "Identify SQLi vulnerability in app.py"
+    difficulty: "medium"
+  - id: task_3
+    name: "Path Traversal"
+    description: "Find path traversal bug in utils.py"
+    difficulty: "hard"
+

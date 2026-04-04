@@ -6,7 +6,7 @@ FROM ghcr.io/meta-pytorch/openenv-base:latest
 WORKDIR /app
 
 # Copy the environment project
-COPY AI_SECURITY_AUDITOR/ /app/env/
+COPY . /app/env/
 
 # Set workdir to the project root
 WORKDIR /app/env

@@ -97,7 +97,7 @@ class AiSecurityAuditorEnvironment(Environment):
         if action.command == "list_files":
             files = list(self.task["files"].keys())
             return AiSecurityAuditorObservation(
-                message=f"Found {len(files)} files.",
+                message=f"Found {len(files)} file(s): {', '.join(files)}. Use read_file to inspect each one.",
                 files=files,
                 done=False,
                 reward=0.0

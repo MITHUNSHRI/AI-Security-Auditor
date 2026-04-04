@@ -1,0 +1,14 @@
+.venv
+__pycache__
+*.pyc
+.DS_Store
+.env
+inference_*.txt
+validation_*.log
+out.txt
+uvicorn_error.log
+inference_run.txt
+C:\Users\MITHUNRAJU\.gemini\antigravity\brain\de9dba68-8bdd-4253-a0e6-92e2239c9094\audit_report.md
+C:\Users\MITHUNRAJU\.gemini\antigravity\brain\de9dba68-8bdd-4253-a0e6-92e2239c9094\final_audit_report.md
+C:\Users\MITHUNRAJU\.gemini\antigravity\brain\de9dba68-8bdd-4253-a0e6-92e2239c9094\task.md
+C:\Users\MITHUNRAJU\.gemini\antigravity\brain\de9dba68-8bdd-4253-a0e6-92e2239c9094\walkthrough.md

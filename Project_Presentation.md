@@ -78,6 +78,6 @@ $env:GROQ_API_KEY="gsk_your_api_key_here"
 python inference.py
 ```
 
-**Step 3:** Watch the Terminal.
+**Step 3:** Watch the Terminal .
 * You will immediately see the AI Agent begin talking to the environment. 
 * You can describe the steps out loud to your mentor: *"Right now, the AI is asking the server to see the `app.py` file. Now it's reading the SQL code. Now it realized it's vulnerable and is submitting the report for grading!"*

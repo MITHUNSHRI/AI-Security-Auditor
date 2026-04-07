@@ -14,19 +14,25 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # ── Configuration ──────────────────────────────────────────────────────────────
-# OPENAI_API_KEY is the required primary key per OpenEnv spec.
-# GROQ_API_KEY is accepted as a fallback for local development.
+# Validator-injected environment variables for Meta Hackathon Phase 2.
+# These MUST be used exactly as provided to pass the LLM proxy check.
 API_BASE_URL = os.environ.get("API_BASE_URL", "https://api.groq.com/openai/v1")
-MODEL_NAME   = os.environ.get("MODEL_NAME",   "llama-3.3-70b-versatile")
-API_KEY      = os.environ.get("OPENAI_API_KEY", os.environ.get("GROQ_API_KEY"))
+API_KEY      = os.environ.get("API_KEY", os.environ.get("OPENAI_API_KEY", os.environ.get("GROQ_API_KEY")))
+MODEL_NAME   = os.environ.get("MODEL_NAME", "llama-3.3-70b-versatile")
 
 def get_api_client():
-    """Safely initializes the OpenAI client if API key is present."""
-    if not API_KEY:
-        logger.warning("No API key found. Script will run in MOCK mode.")
+    """Initializes the OpenAI client using THE exact injector keys."""
+    # During validation, os.environ["API_KEY"] and ["API_BASE_URL"] will be present.
+    # We use .get() locally to avoid crashing, but the key is that 'API_KEY' is now the primary.
+    if not API_KEY or not API_BASE_URL:
+        logger.warning("Required API_KEY or API_BASE_URL not found. Script will run in MOCK mode.")
         return None
     try:
-        return OpenAI(base_url=API_BASE_URL, api_key=API_KEY)
+        # Initializing EXACTLY as requested by the validator instructions
+        return OpenAI(
+            base_url=API_BASE_URL,
+            api_key=API_KEY
+        )
     except Exception as e:
         logger.error(f"Failed to initialize OpenAI client: {e!r}")
         return None

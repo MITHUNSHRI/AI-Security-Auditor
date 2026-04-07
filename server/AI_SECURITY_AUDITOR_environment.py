@@ -73,6 +73,15 @@ class AiSecurityAuditorEnvironment(Environment):
         self.task = self.TASKS[self.task_id]
         self.done = False
 
+    def _clamp_reward(self, reward: float) -> float:
+        """Ensures reward is strictly between 0 and 1 per validator requirement."""
+        # Mapping 0 -> 0.05 and 1 -> 0.95 to stay safely within (0, 1)
+        if reward <= 0.0:
+            return 0.05
+        if reward >= 1.0:
+            return 0.95
+        return reward
+
     def reset(self) -> AiSecurityAuditorObservation:
         """Reset the environment to a clean state."""
         self._state = State(episode_id=str(uuid4()), step_count=0)
@@ -80,7 +89,7 @@ class AiSecurityAuditorEnvironment(Environment):
         return AiSecurityAuditorObservation(
             message=f"Environment ready for task: {self.task['name']}. Use list_files and read_file to investigate.",
             done=False,
-            reward=0.0,
+            reward=self._clamp_reward(0.0),
         )
 
     def step(self, action: AiSecurityAuditorAction) -> AiSecurityAuditorObservation:  # type: ignore[override]
@@ -91,7 +100,7 @@ class AiSecurityAuditorEnvironment(Environment):
             return AiSecurityAuditorObservation(
                 message="Episode already completed.",
                 done=True,
-                reward=0.0
+                reward=self._clamp_reward(0.0)
             )
 
         if action.command == "list_files":
@@ -100,7 +109,7 @@ class AiSecurityAuditorEnvironment(Environment):
                 message=f"Found {len(files)} file(s): {', '.join(files)}. Use read_file to inspect each one.",
                 files=files,
                 done=False,
-                reward=0.0
+                reward=self._clamp_reward(0.0)
             )
 
         elif action.command == "read_file":
@@ -109,14 +118,14 @@ class AiSecurityAuditorEnvironment(Environment):
                 return AiSecurityAuditorObservation(
                     message=self.task["files"][path],
                     done=False,
-                    reward=0.0
+                    reward=self._clamp_reward(0.0)
                 )
             else:
                 return AiSecurityAuditorObservation(
                     message=f"Error: File {path} not found.",
                     error=f"File {path} not found.",
                     done=False,
-                    reward=-0.1
+                    reward=self._clamp_reward(0.0) # Changed from -0.1 to stay in (0, 1)
                 )
 
         elif action.command == "submit_report":
@@ -126,10 +135,11 @@ class AiSecurityAuditorEnvironment(Environment):
                     message="Submitted empty report.",
                     success=False,
                     done=True,
-                    reward=0.0
+                    reward=self._clamp_reward(0.0)
                 )
             
-            score, feedback = self._grade_report(action.report)
+            raw_score, feedback = self._grade_report(action.report)
+            score = self._clamp_reward(raw_score)
             return AiSecurityAuditorObservation(
                 message=f"Report submitted. Score: {score:.2f}. Feedback: {feedback}",
                 success=score > 0.8,
@@ -141,7 +151,7 @@ class AiSecurityAuditorEnvironment(Environment):
             message="Invalid command.",
             error="Unknown action command.",
             done=False,
-            reward=-0.1
+            reward=self._clamp_reward(0.0) # Changed from -0.1 to stay in (0, 1)
         )
 
     def _grade_report(self, report: List[VulnerabilityReport]) -> (float, str):

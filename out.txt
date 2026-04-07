@@ -40,3 +40,31 @@ Step 7: Action -> list_files ./
 Step 8: Action -> list_files ./
 Step 9: Action -> list_files ./
 Reached maximum steps.
+
+
+Walkthrough - Fixing LLM Proxy Connection for Meta Phase 2
+I have updated the inference.py script to ensure it correctly interacts with the Meta Hackathon Phase 2 LLM proxy. This fix ensures that the API_BASE_URL and API_KEY environment variables provided by the validator are used for all LLM calls.
+
+Changes Made
+1. Updated Configuration to use Validator Variables
+API_BASE_URL: Now prioritizes os.environ.get("API_BASE_URL") as its primary source.
+API_KEY: Now prioritizes os.environ.get("API_KEY") exactly as required by the validator proxy.
+Fallbacks: Kept OPENAI_API_KEY and GROQ_API_KEY as secondary fallbacks for local development to avoid crashing outside of the validator environment.
+2. Strict OpenAI Client Initialization
+Modified get_api_client() to initialize the OpenAI object precisely with the base URL and API key from the environment.
+This ensures that LLM requests pass through the LiteLLM proxy correctly, updating your last_active status in the validator log.
+python
+# Updated initialization as requested by Meta Phase 2 instructions
+client = OpenAI(
+    base_url=API_BASE_URL, # from os.environ["API_BASE_URL"]
+    api_key=API_KEY       # from os.environ["API_KEY"]
+)
+3. Ensured API Request Execution
+The script continues to attempt a client.chat.completions.create call in every step during the 10-step task loop.
+If the validator injects the keys, the call will be attempted through the proxy, satisfying the "No API calls were made" check.
+Verification
+Verified that the logic still runs locally in MOCK mode when no keys are present (preventing initial build crashes).
+Verified that the script structure matches the "How to Fix" snippet provided in your validator log.
+Next Steps
+Push to Hugging Face: Run the push command below to update your Space.
+Validator: Re-run the Phase 2 validator on the hackathon platform.
